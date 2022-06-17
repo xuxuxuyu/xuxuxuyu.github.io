@@ -162,13 +162,13 @@
 
     <div class="post-header index">
         <h1 class="title">
-            <a href="/2022/06/17/%E5%88%98%E5%BF%97%E8%B6%85%E4%B8%93%E5%B1%9E/">
+            <a href="/2022/06/16/%E5%88%98%E5%BF%97%E8%B6%85%E4%B8%93%E5%B1%9E/">
                 刘志超是猪么
             </a>
         </h1>
         <div class="post-info">
             
-                <span class="date">2022-06-17</span>
+                <span class="date">2022-06-16</span>
             
             
             
@@ -182,47 +182,6 @@
     
         <div class="content">
             <h2 id="刘志超王八蛋"><a href="#刘志超王八蛋" class="headerlink" title="刘志超王八蛋"></a>刘志超王八蛋</h2><h2 id="瓜冬瓜哈密瓜，不爱我你是傻瓜"><a href="#瓜冬瓜哈密瓜，不爱我你是傻瓜" class="headerlink" title="瓜冬瓜哈密瓜，不爱我你是傻瓜"></a>瓜冬瓜哈密瓜，不爱我你是傻瓜</h2>
-        </div>
-    
-
-</div>
-            
-                
-<div class="post">
-
-    <div class="post-header index">
-        <h1 class="title">
-            <a href="/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/">
-                防抖节流函数
-            </a>
-        </h1>
-        <div class="post-info">
-            
-                <span class="date">2022-06-16</span>
-            
-            
-            
-                <span class="category">
-                    <a href="/categories/js/">js</a>
-                </span>
-            
-        </div>
-    </div>
-
-    
-        <div class="content">
-            <h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>节流: n 秒内只运行一次，若在 n 秒内重复触发，只有一次生效<br>防抖: n 秒后在执行该事件，若在 n 秒内被重复触发，则重新计时</p>
-<p>假设电梯有两种运行策略 debounce 和 throttle，超时设定为15秒，不考虑容量限制<br>电梯第一个人进来后，15秒后准时运送一次，这是节流<br>电梯第一个人进来后，等待15秒。如果过程中又有人进来，15秒等待重新计时，直到15秒后开始运送，这是防抖</p>
-<h2 id="手写"><a href="#手写" class="headerlink" title="手写"></a>手写</h2><ol>
-<li>防抖<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doulbeTime</span>(<span class="params">fn, delay = <span class="number">500</span></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> timer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (timer) &#123;</span><br><span class="line">      <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="title function_">fn</span>();</span><br><span class="line">    &#125;, delay);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<ul>
-<li>利用useEffect的副作用函数实现防抖  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">useEffect</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">  <span class="keyword">const</span> timer = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">fn</span>();</span><br><span class="line">  &#125;, <span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;,[text])</span><br></pre></td></tr></table></figure></li>
-</ul>
-<ol start="2">
-<li>节流  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">debounce</span>(<span class="params">fn, delay</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> timer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!timer) &#123;</span><br><span class="line">      timer = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">fn</span>();</span><br><span class="line">        timer = <span class="literal">null</span>;</span><br><span class="line">      &#125;, delay);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-
         </div>
     
 
@@ -347,6 +306,47 @@
 
 </div>
             
+                
+<div class="post">
+
+    <div class="post-header index">
+        <h1 class="title">
+            <a href="/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/">
+                防抖节流函数
+            </a>
+        </h1>
+        <div class="post-info">
+            
+                <span class="date">2022-06-16</span>
+            
+            
+            
+                <span class="category">
+                    <a href="/categories/js/">js</a>
+                </span>
+            
+        </div>
+    </div>
+
+    
+        <div class="content">
+            <h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>节流: n 秒内只运行一次，若在 n 秒内重复触发，只有一次生效<br>防抖: n 秒后在执行该事件，若在 n 秒内被重复触发，则重新计时</p>
+<p>假设电梯有两种运行策略 debounce 和 throttle，超时设定为15秒，不考虑容量限制<br>电梯第一个人进来后，15秒后准时运送一次，这是节流<br>电梯第一个人进来后，等待15秒。如果过程中又有人进来，15秒等待重新计时，直到15秒后开始运送，这是防抖</p>
+<h2 id="手写"><a href="#手写" class="headerlink" title="手写"></a>手写</h2><ol>
+<li>防抖<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">doulbeTime</span>(<span class="params">fn, delay = <span class="number">500</span></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> timer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (timer) &#123;</span><br><span class="line">      <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="title function_">fn</span>();</span><br><span class="line">    &#125;, delay);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>利用useEffect的副作用函数实现防抖  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">useEffect</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">  <span class="keyword">const</span> timer = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">fn</span>();</span><br><span class="line">  &#125;, <span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;,[text])</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="2">
+<li>节流  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">debounce</span>(<span class="params">fn, delay</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> timer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!timer) &#123;</span><br><span class="line">      timer = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">fn</span>();</span><br><span class="line">        timer = <span class="literal">null</span>;</span><br><span class="line">      &#125;, delay);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+        </div>
+    
+
+</div>
+            
         </section>
     </div>
 </div>
@@ -376,15 +376,15 @@
         <ul>
             
             <li>
-                <a class="footer-post" href="/2022/06/17/%E5%88%98%E5%BF%97%E8%B6%85%E4%B8%93%E5%B1%9E/">刘志超是猪么</a>
-            </li>
-            
-            <li>
-                <a class="footer-post" href="/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/">防抖节流函数</a>
+                <a class="footer-post" href="/2022/06/16/%E5%88%98%E5%BF%97%E8%B6%85%E4%B8%93%E5%B1%9E/">刘志超是猪么</a>
             </li>
             
             <li>
                 <a class="footer-post" href="/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/">面试题</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/">防抖节流函数</a>
             </li>
             
         </ul>
@@ -398,15 +398,15 @@
     <ul>
         
         <li>
-            <a class="footer-post" href="/categories/js/">js</a>
-        </li>
-        
-        <li>
             <a class="footer-post" href="/categories/%E7%88%B1%E6%83%85/">爱情</a>
         </li>
         
         <li>
             <a class="footer-post" href="/categories/%E9%9D%A2%E8%AF%95/">面试</a>
+        </li>
+        
+        <li>
+            <a class="footer-post" href="/categories/js/">js</a>
         </li>
         
     </ul>
