@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>页面生命周期事件的理解</title>
+    <link href="/2022/06/22/%E9%A1%B5%E9%9D%A2%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/"/>
+    <url>/2022/06/22/%E9%A1%B5%E9%9D%A2%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/</url>
+    
+    <content type="html"><![CDATA[<h2 id="HTML页面的生命周期包含三个重要事件"><a href="#HTML页面的生命周期包含三个重要事件" class="headerlink" title="HTML页面的生命周期包含三个重要事件"></a>HTML页面的生命周期包含三个重要事件</h2><ul><li>DOMContentLoaded——浏览器已完全加载HTML,并构建了DOM树，但像 <code>&lt;img&gt;</code> 和样式表之类的外部资源可能尚未加载完成。</li><li>load —— 浏览器不仅加载完成了 HTML，还加载完成了所有外部资源：图片，样式等。</li><li>beforeunload&#x2F;unload —— 当用户正在离开页面时。</li></ul><p>每个事件都是有用的：</p><ul><li>DOMContentLoaded 事件 —— DOM 已经就绪，因此处理程序可以查找 DOM 节点，并初始化接口。</li><li>load 事件 —— 外部资源已加载完成，样式已被应用，图片大小也已知了。</li><li>beforeunload 事件 —— 用户正在离开：我们可以检查用户是否保存了更改，并询问他是否真的要离开。</li><li>unload 事件 —— 用户几乎已经离开了，但是我们仍然可以启动一些操作，例如发送统计数据。</li></ul><h2 id="DOMContentLoaded-和脚本"><a href="#DOMContentLoaded-和脚本" class="headerlink" title="DOMContentLoaded 和脚本"></a>DOMContentLoaded 和脚本</h2><p>当浏览器处理一个 HTML 文档，并在文档中遇到<code>&lt;script&gt;</code>标签时，就会在继续构建 DOM 之前运行它。这是一种防范措施，因为脚本可能想要修改 DOM，甚至对其执行 document.write 操作，所以DOMContentLoaded 必须等待脚本执行结束。因此，DOMContentLoaded 肯定在下面的这些脚本执行结束之后发生。</p><p>此规则有两个例外：</p><ul><li>具有 async 特性（attribute）的脚本不会阻塞 DOMContentLoaded，稍后 我们会讲到。</li><li>使用 document.createElement(‘script’) 动态生成并添加到网页的脚本也不会阻塞 DOMContentLoaded。</li></ul><h2 id="DOMContentLoaded-和样式"><a href="#DOMContentLoaded-和样式" class="headerlink" title="DOMContentLoaded 和样式"></a>DOMContentLoaded 和样式</h2><p>外部样式表不会影响 DOM，因此 DOMContentLoaded 不会等待它们。</p><p>但这里有一个陷阱。如果在样式后面有一个脚本，那么该脚本必须等待样式表加载完成。原因是，脚本可能想要获取元素的坐标和其他与样式相关的属性。因此，它必须等待样式加载完成。<br>当 DOMContentLoaded 等待脚本时，它现在也在等待脚本前面的样式。</p><h2 id="浏览器内建的自动填充"><a href="#浏览器内建的自动填充" class="headerlink" title="浏览器内建的自动填充"></a>浏览器内建的自动填充</h2><p>Firefox，Chrome 和 Opera 都会在 DOMContentLoaded 中自动填充表单。</p><p>例如，如果页面有一个带有登录名和密码的表单，并且浏览器记住了这些值，那么在 DOMContentLoaded 上，浏览器会尝试自动填充它们（如果得到了用户允许）。</p><p>因此，如果 DOMContentLoaded 被需要加载很长时间的脚本延迟触发，那么自动填充也会等待。你可能在某些网站上看到过（如果你使用浏览器自动填充）—— 登录名&#x2F;密码字段不会立即自动填充，而是在页面被完全加载前会延迟填充。这实际上是 DOMContentLoaded 事件之前的延迟。</p><h2 id="window-onload"><a href="#window-onload" class="headerlink" title="window.onload"></a>window.onload</h2><p>当整个页面，包括样式、图片和其他资源被加载完成时，会触发 window 对象上的 load 事件。可以通过 onload 属性获取此事件。</p><h2 id="window-onunload"><a href="#window-onunload" class="headerlink" title="window.onunload"></a>window.onunload</h2><p>当访问者离开页面时，window 对象上的 unload 事件就会被触发。我们可以在那里做一些不涉及延迟的操作，例如关闭相关的弹出窗口。</p><p>有一个值得注意的特殊情况是发送分析数据。</p><p>假设我们收集有关页面使用情况的数据：鼠标点击，滚动，被查看的页面区域等。</p><p>自然地，当用户要离开的时候，我们希望通过 unload 事件将数据保存到我们的服务器上。</p><p>有一个特殊的 navigator.sendBeacon(url, data) 方法可以满足这种需求，详见规范 <a href="https://w3c.github.io/beacon/%E3%80%82">https://w3c.github.io/beacon/。</a></p><p>它在后台发送数据，转换到另外一个页面不会有延迟：浏览器离开页面，但仍然在执行 sendBeacon。</p><p>当 sendBeacon 请求完成时，浏览器可能已经离开了文档，所以就无法获取服务器响应（对于分析数据来说通常为空）。</p><p>还有一个 keep-alive 标志，该标志用于在 fetch 方法中为通用的网络请求执行此类“离开页面后”的请求。你可以在 Fetch API 一章中找到更多相关信息。</p><p>如果我们要取消跳转到另一页面的操作，在这里做不到。但是我们可以使用另一个事件 —— onbeforeunload。</p><h2 id="window-onbeforeunload"><a href="#window-onbeforeunload" class="headerlink" title="window.onbeforeunload"></a>window.onbeforeunload</h2><p>如果访问者触发了离开页面的导航（navigation）或试图关闭窗口，beforeunload 处理程序将要求进行更多确认。</p><p>如果我们要取消事件，浏览器会询问用户是否确定。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>页面生命周期事件：</p><ul><li>当 DOM 准备就绪时，document 上的 DOMContentLoaded 事件就会被触发。在这个阶段，我们可以将 JavaScript 应用于元素。 诸如 <code>&lt;script&gt;</code> 或 <code>&lt;script src=&quot;...&quot;&gt;&lt;/script&gt; </code>之类的脚本会阻塞 DOMContentLoaded，浏览器将等待它们执行结束。</li><li>图片和其他资源仍然可以继续被加载。</li><li>当页面和所有资源都加载完成时，window 上的 load 事件就会被触发。我们很少使用它，因为通常无需等待那么长时间。</li><li>当用户想要离开页面时，window 上的 beforeunload 事件就会被触发。如果我们取消这个事件，浏览器就会询问我们是否真的要离开（例如，我们有未保存的更改）。</li><li>当用户最终离开时，window 上的 unload 事件就会被触发。在处理程序中，我们只能执行不涉及延迟或询问用户的简单操作。正是由于这个限制，它很少被使用。我们可以使用 navigator.sendBeacon 来发送网络请求。</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>HTML</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>HTML, 面试题</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>防抖节流函数</title>
+    <link href="/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/"/>
+    <url>/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>节流: n 秒内只运行一次，若在 n 秒内重复触发，只有一次生效<br>防抖: n 秒后在执行该事件，若在 n 秒内被重复触发，则重新计时</p><p>假设电梯有两种运行策略 debounce 和 throttle，超时设定为15秒，不考虑容量限制<br>电梯第一个人进来后，15秒后准时运送一次，这是节流<br>电梯第一个人进来后，等待15秒。如果过程中又有人进来，15秒等待重新计时，直到15秒后开始运送，这是防抖</p><h2 id="手写"><a href="#手写" class="headerlink" title="手写"></a>手写</h2><ol><li>防抖<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">doulbeTime</span>(<span class="hljs-params">fn, delay = <span class="hljs-number">500</span></span>) &#123;<br>  <span class="hljs-keyword">let</span> timer = <span class="hljs-literal">null</span>;<br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">if</span> (timer) &#123;<br>      <span class="hljs-built_in">clearTimeout</span>(timer);<br>    &#125;<br>    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>      <span class="hljs-title function_">fn</span>();<br>    &#125;, delay);<br>  &#125;;<br>&#125;<br></code></pre></td></tr></table></figure></li></ol><ul><li>利用useEffect的副作用函数实现防抖  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-title function_">useEffect</span>(<span class="hljs-function">()=&gt;</span>&#123;<br>  <span class="hljs-keyword">const</span> timer = <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-title function_">fn</span>();<br>  &#125;, <span class="hljs-number">1000</span>);<br><br>  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-built_in">clearTimeout</span>(timer);<br>  &#125;;<br>&#125;,[text])<br></code></pre></td></tr></table></figure></li></ul><ol start="2"><li>节流  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">debounce</span>(<span class="hljs-params">fn, delay</span>) &#123;<br>  <span class="hljs-keyword">let</span> timer = <span class="hljs-literal">null</span>;<br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">if</span> (!timer) &#123;<br>      timer = <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-title function_">fn</span>();<br>        timer = <span class="hljs-literal">null</span>;<br>      &#125;, delay);<br>    &#125;<br>  &#125;;<br>&#125;<br></code></pre></td></tr></table></figure></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>js</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>js</tag>
+      
+      <tag>手写函数</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>面试题</title>
+    <link href="/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/"/>
+    <url>/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/</url>
+    
+    <content type="html"><![CDATA[<ol><li><p>HTML5 新增的一些标签</p></li><li><p>CSS3 新特性</p></li><li><p>实现垂直水平居中的几种方式 (30%)</p></li><li><p>JS 的数据类型以及区别（数据类型检测的方式 typeof instanceof constructor Object.prototype.toString.call()）</p></li><li><p>JS 的原型</p></li><li><p>JS 实现继承的方式</p></li><li><p>call,apply,bind 的区别</p></li><li><p>JS 事件监听以及事件阶段（捕获阶段、目标阶段、冒泡阶段）</p></li><li><p>阻止事件冒泡兼容 IE（event.cancelBubble &#x3D; true;）</p></li><li><p>事件委托</p></li><li><p>js 内置对象（数组、字符串常用的）</p></li><li><p>原生 ajax 对象 XMLHttpRequest，</p></li><li><p>跨域以及跨域的解决办法</p></li><li><p>es6 新增的一些</p></li><li><p>promise，实例方法</p></li><li><p>异步编程的几种方式</p></li><li><p>宏任务微任务</p></li><li><p>定时器的第二个参数时间是如何衡量的（函数只是将事件插入了任务列表，必须等到当前代码执行完，主线程才会去 执行它指定的回调函数，有可能要等很久，所以没有办法保证回调函数一定会在 setTimeout 指定的时间内执行，100 毫秒是插入队列的时间+等待的时间）</p></li><li><p>介绍防抖节流原理</p></li><li><p>JS 的垃圾回收机制</p></li><li><p>ts 中 type, interface 区别</p></li><li><p>ts 断言，非空断言</p></li><li><p>http 常见状态码（304 协商缓存）</p></li><li><p>说说地址栏输入 URL 敲下回车后发生了什么<br>URL 解析<br>DNS 查询<br>TCP 连接<br>HTTP 请求<br>响应请求<br>页面渲染</p></li><li><p>get,post 请求区别</p></li><li><p>react 生命周期</p></li><li><p>setState 异步同步</p></li><li><p>解释一下虚拟 dom</p></li><li><p>react 中 key 的作用</p></li><li><p>常用的 hooks</p></li><li><p>useMemo 和 useCallback 区别</p></li><li><p>vue 的内置指令有哪些</p></li><li><p>vue 双向绑定原理</p></li><li><p>vue 如何检测数组变化</p></li><li><p>vue 如何实现组件之间的通信<br>$parent &#x2F; $children &amp; $refs<br>Provider &#x2F; Inject<br>$attrs &#x2F; $listeners<br>Vuex<br>$emit &#x2F; $on</p></li><li><p>vue3.0 双向绑定原理</p></li><li><p>vue3.0 与 2.0 有哪些区别</p></li><li><p>前端优化<br>基于现有网页做 seo 优化方面的工作，具体如何实现的</p></li></ol><p><code>通过</code>webpack&#96;优化前端的手段有：</p><ul><li>JS 代码压缩</li><li>CSS 代码压缩</li><li>Html 文件代码压缩</li><li>文件大小压缩</li><li>图片压缩</li><li>Tree Shaking</li><li>代码分离</li><li>内联 chunk</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试题</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
