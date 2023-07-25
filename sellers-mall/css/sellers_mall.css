@@ -605,7 +605,6 @@ main .direct .right .bottom img{
 }
 	/*direct_purchase end*/
 	/*floor one start*/
-}
 main section{
 	display: block;
 	margin-top: 10px;
@@ -843,7 +842,9 @@ footer{
 	box-sizing: border-box;
 }
 footer ul{
-	margin-left: 456px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	margin-bottom: 30px;
 }
 footer ul li{
