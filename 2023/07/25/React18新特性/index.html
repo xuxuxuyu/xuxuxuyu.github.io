@@ -1,0 +1,701 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="xuxuxuyu">
+  <meta name="keywords" content="JS,TS,React,Vue">
+  
+    <meta name="description" content="批处理范围扩大了 批处理支持处理的操作范围扩大了：Promise，setTimeout，native event handlers 等这些非 React 原生的事件内部的更新也会得到合并  react18之前，react会对state更新进行批处理，看例子，点击按钮时会产生两次 state 的更新，按理来说每次 state 更新都会导致一次 re-render。但是，这两次更新完全可以合成一次，从">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React18新特性">
+<meta property="og:url" content="https://xuxuxuyu.github.io/2023/07/25/React18%E6%96%B0%E7%89%B9%E6%80%A7/index.html">
+<meta property="og:site_name" content="小雨滴滴滴滴滴滴的记录">
+<meta property="og:description" content="批处理范围扩大了 批处理支持处理的操作范围扩大了：Promise，setTimeout，native event handlers 等这些非 React 原生的事件内部的更新也会得到合并  react18之前，react会对state更新进行批处理，看例子，点击按钮时会产生两次 state 的更新，按理来说每次 state 更新都会导致一次 re-render。但是，这两次更新完全可以合成一次，从">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-25T06:09:53.000Z">
+<meta property="article:modified_time" content="2023-07-25T07:08:08.218Z">
+<meta property="article:author" content="xuxuxuyu">
+<meta property="article:tag" content="JS,TS,React,Vue">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>React18新特性 - 小雨滴滴滴滴滴滴的记录</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxuxuyu.github.io","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小雨滴滴滴滴滴滴</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                <span>作品展示</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/strawberry">
+                    
+                    <span>草莓协会</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/sellers-mall">
+                    
+                    <span>赛尔斯商城</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/input-method">
+                    
+                    <span>手心输入法</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="React18新特性"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-07-25 14:09" pubdate>
+          2023年7月25日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          27 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">React18新特性</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="批处理范围扩大了"><a href="#批处理范围扩大了" class="headerlink" title="批处理范围扩大了"></a>批处理范围扩大了</h2><ol>
+<li><p>批处理支持处理的操作范围扩大了：Promise，setTimeout，native event handlers 等这些非 React 原生的事件内部的更新也会得到合并</p>
+<ul>
+<li>react18之前，react会对state更新进行批处理，看例子，点击按钮时会产生两次 state 的更新，按理来说每次 state 更新都会导致一次 re-render。但是，这两次更新完全可以合成一次，从而减少无谓的 re-render 带来的性能损失。这种批处理只限于 React 原生事件内部的更新。 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Test</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">const</span> [count, setCount] = <span class="hljs-title function_">useState</span>(<span class="hljs-number">0</span>);<br><br>  <span class="hljs-keyword">const</span> [flag, setFlag] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>);<br><br>  <span class="hljs-keyword">function</span> <span class="hljs-title function_">handleClick</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-title function_">setCount</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =&gt;</span> c + <span class="hljs-number">1</span>); <br>    <span class="hljs-title function_">setFlag</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> !f);<br>  &#125;<br><br>  <span class="hljs-keyword">return</span> (<br>    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span></span><br><span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>&#123;count&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br><span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">&#123;handleClick&#125;</span>&gt;</span>Next<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br>  );<br>&#125;<br><br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h2 id="createRoot"><a href="#createRoot" class="headerlink" title="createRoot"></a>createRoot</h2><p>Transition 本质上是用于一些不是很急迫的更新上，在 React 18 之前，所有的更新任务都被视为急迫的任务，在 React 18 诞生了 concurrent Mode 模式，在这个模式下，渲染是可以中断，低优先级任务，可以让高优先级的任务先更新渲染。可以说 React 18 更青睐于良好的用户体验。startTransition 依赖于 concurrent Mode 渲染并发模式。也就是说在 React 18 中使用 startTransition ，那么要先开启并发模式，也就是需要通过 createRoot 创建 Root 。我们先来看一下两种模式下，创建 Root 区别。</p>
+<ul>
+<li>传统模式<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> <span class="hljs-title class_">ReactDOM</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-dom&#x27;</span><br><span class="hljs-comment">/* 通过 ReactDOM.render  */</span><br><span class="hljs-title class_">ReactDOM</span>.<span class="hljs-title function_">render</span>(<br>  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span></span>,<br>  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;app&#x27;</span>)<br>)<br></code></pre></td></tr></table></figure></li>
+<li>concurrent Mode并发模式<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> <span class="hljs-title class_">ReactDOM</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react-dom&#x27;</span><br><span class="hljs-comment">/* 通过 createRoot 创建 root */</span><br><span class="hljs-keyword">const</span> root =  <span class="hljs-title class_">ReactDOM</span>.<span class="hljs-title function_">createRoot</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;app&#x27;</span>))<br><span class="hljs-comment">/* 调用 root 的 render 方法 */</span><br>root.<span class="hljs-title function_">render</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">App</span>/&gt;</span></span>)<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="Transitions"><a href="#Transitions" class="headerlink" title="Transitions"></a>Transitions</h2><ol>
+<li><p>Transitions 是 React 中一个用于区分高优更新和非高优更新的新概念。</p>
+<ul>
+<li>高优的更新&#x2F;渲染：包括鼠标点击、打字等对实时交互性要求很高的更新场景，卡顿时会影响用户的交互行为，使用户明显感到整个页面卡顿。</li>
+<li>高优的更新&#x2F;渲染：普通的 UI 更新，不与用户的交互相关，一些对更新实时性要求没那么高的场景。<br> 举例 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; startTransition &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;react&quot;</span>;<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">handleChange</span>=(<span class="hljs-params"></span>)=&gt;&#123;<br>    <span class="hljs-comment">/* 高优先级任务 —— 改变搜索条件 */</span><br>    <span class="hljs-title function_">setInputValue</span>(e.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>)<br>    <span class="hljs-comment">/* 低优先级任务 —— 改变搜索过滤后列表状态  */</span><br>    <span class="hljs-title function_">startTransition</span>(<span class="hljs-function">()=&gt;</span>&#123;<br>        <span class="hljs-title function_">setSearchQuery</span>(e.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>)<br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure>
+ useTransition：除了能提供 startTransition 以外，还能提供一个变量来跟踪当前渲染的执行状态： <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">import</span> &#123; useTransition &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;react&quot;</span>;<br><br><span class="hljs-keyword">const</span> [isPending, startTransition] = <span class="hljs-title function_">useTransition</span>();<br><br><span class="hljs-keyword">return</span> isPending &amp;&amp; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Spinner</span> /&gt;</span></span>;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>与防抖节流的区别</p>
+<ul>
+<li>节流防抖 本质上也是 setTimeout ，只不过控制了执行的频率，原理就是让 render 次数减少了。而 transitions 和它相比，并没有减少渲染的次数。</li>
+<li>setTimeout 是异步延时执行，而 startTransition 的回调函数是同步执行的。在 startTransition 之中任何更新，都会标记上 transition，React 将在更新的时候，判断这个标记来决定是否完成此次更新。所以 Transition 可以理解成比 setTimeout 更早的更新。但是同时要保证 ui 的正常响应，在性能好的设备上，transition 两次更新的延迟会很小，但是在慢的设备上，延时会很大，但是不会影响 UI 的响应。</li>
+<li>节流和防抖需要有效掌握 Delay Time 延时时间，如果时间过长，那么给人一种渲染滞后的感觉，如果时间过短，那么就类似于 setTimeout(fn,0) 还会造成前面的问题。而 startTransition 就不需要考虑这么多。</li>
+</ul>
+</li>
+<li><p>原理</p>
+<ol>
+<li>startTransition<ul>
+<li>原理特别简单，有点像 React17 中 batchUpdate 的批量处理逻辑。就是通过设置开关的方式，而开关就是 transition &#x3D; 1 ，然后执行更新，里面的更新任务都会获得 transtion 标志。上代码。 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">startTransition</span>(<span class="hljs-params">scope</span>) &#123;<br>  <span class="hljs-keyword">const</span> prevTransition = <span class="hljs-title class_">ReactCurrentBatchConfig</span>.<span class="hljs-property">transition</span>;<br>  <span class="hljs-comment">/* 通过设置状态 */</span><br>  <span class="hljs-title class_">ReactCurrentBatchConfig</span>.<span class="hljs-property">transition</span> = <span class="hljs-number">1</span>;<br>  <span class="hljs-keyword">try</span> &#123;  <br>      <span class="hljs-comment">/* 执行更新 */</span><br>    <span class="hljs-title function_">scope</span>();<br>  &#125; <span class="hljs-keyword">finally</span> &#123;<br>    <span class="hljs-comment">/* 恢复状态 */</span>  <br>    <span class="hljs-title class_">ReactCurrentBatchConfig</span>.<span class="hljs-property">transition</span> = prevTransition;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>useTranstion<ul>
+<li><p>useTranstion 本质上就是 useState + startTransition 。<br>通过 useState 来改变 pending 状态。在 mountTransition 执行过程中，会触发两次 setPending ，一次在 transition &#x3D; 1 之前，一次在之后。一次会正常更新 setPending(true) ，一次会作为 transition 过渡任务更新 setPending(false); ，所以能够精准捕获到过渡时间。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">mountTransition</span>(<span class="hljs-params"></span>)&#123;<br>  <span class="hljs-keyword">const</span> [isPending, setPending] = <span class="hljs-title function_">mountState</span>(<span class="hljs-literal">false</span>);<br>  <span class="hljs-keyword">const</span> <span class="hljs-title function_">start</span> = (<span class="hljs-params">callback</span>)=&gt;&#123;<br>    <span class="hljs-title function_">setPending</span>(<span class="hljs-literal">true</span>);<br>    <span class="hljs-keyword">const</span> prevTransition = <span class="hljs-title class_">ReactCurrentBatchConfig</span>.<span class="hljs-property">transition</span>;<br>    <span class="hljs-title class_">ReactCurrentBatchConfig</span>.<span class="hljs-property">transition</span> = <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-title function_">setPending</span>(<span class="hljs-literal">false</span>);<br>        <span class="hljs-title function_">callback</span>();<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-title class_">ReactCurrentBatchConfig</span>.<span class="hljs-property">transition</span> = prevTransition;<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span> [isPending, start];<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="Suspense"><a href="#Suspense" class="headerlink" title="Suspense"></a>Suspense</h2>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/React/" class="category-chain-item">React</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>React18新特性</div>
+      <div>https://xuxuxuyu.github.io/2023/07/25/React18新特性/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>xuxuxuyu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年7月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/07/25/%E6%89%8B%E5%86%99useUpdate%EF%BC%8C%E8%B0%83%E7%94%A8%E6%97%B6%E5%BC%BA%E5%88%B6%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93/" title="手写useUpdate，调用时强制组件重新渲染">
+                        <span class="hidden-mobile">手写useUpdate，调用时强制组件重新渲染</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <i class="iconfont icon-love"></i> <i class="iconfont icon-love"></i> <i class="iconfont icon-love"></i> <i class="iconfont icon-love"></i> <i class="iconfont icon-love"></i> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
