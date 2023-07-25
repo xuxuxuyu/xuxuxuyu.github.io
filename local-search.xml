@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>手写useUpdate，调用时强制组件重新渲染</title>
+    <link href="/2023/07/25/%E6%89%8B%E5%86%99useUpdate%EF%BC%8C%E8%B0%83%E7%94%A8%E6%97%B6%E5%BC%BA%E5%88%B6%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93/"/>
+    <url>/2023/07/25/%E6%89%8B%E5%86%99useUpdate%EF%BC%8C%E8%B0%83%E7%94%A8%E6%97%B6%E5%BC%BA%E5%88%B6%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93/</url>
+    
+    <content type="html"><![CDATA[<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-keyword">import</span> &#123; useReducer &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>;<br><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">useUpdate</span>(<span class="hljs-params"></span>): <span class="hljs-function">() =&gt;</span> <span class="hljs-keyword">void</span> &#123;<br>  <span class="hljs-keyword">const</span> [, update] = <span class="hljs-title function_">useReducer</span>(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x + <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);<br><br>  <span class="hljs-keyword">return</span> update;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>React</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>js</tag>
+      
+      <tag>手写函数</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>页面生命周期事件的理解</title>
     <link href="/2022/06/22/%E9%A1%B5%E9%9D%A2%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/"/>
     <url>/2022/06/22/%E9%A1%B5%E9%9D%A2%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/</url>
