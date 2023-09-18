@@ -16,22 +16,23 @@
   <meta name="author" content="xuxuxuyu">
   <meta name="keywords" content="JS,TS,React,Vue">
   
-    <meta name="description" content="概念： 多个函数签名体 + 唯一的一个函数体 实现获取字符串或数组长度123456789101112131415function getLength(str: string): number; &#x2F;&#x2F; 函数签名 -&gt; 传入字符串返回字符串长度function getLength&lt;T&gt;(arr: T[]): number; &#x2F;&#x2F; 函数签名 -&gt; 传入数组返回数组长度functi">
+    <meta name="description" content="通过在Promise设置定时器来实现12345678910111213141516171819202122232425export function sleep(ms: number): Promise&lt;undefined&gt; &amp;#123;  &#x2F;&#x2F; 参考答案  return new Promise(    (      resolve: (value: undefined) &#x3D;&gt;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TS方法重载">
-<meta property="og:url" content="https://xuxuxuyu.github.io/2023/09/11/TS%E6%96%B9%E6%B3%95%E9%87%8D%E8%BD%BD/index.html">
+<meta property="og:title" content="实现sleep方法">
+<meta property="og:url" content="https://xuxuxuyu.github.io/2023/09/11/%E5%AE%9E%E7%8E%B0sleep%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="小雨滴滴滴滴滴滴的记录">
-<meta property="og:description" content="概念： 多个函数签名体 + 唯一的一个函数体 实现获取字符串或数组长度123456789101112131415function getLength(str: string): number; &#x2F;&#x2F; 函数签名 -&gt; 传入字符串返回字符串长度function getLength&lt;T&gt;(arr: T[]): number; &#x2F;&#x2F; 函数签名 -&gt; 传入数组返回数组长度functi">
+<meta property="og:description" content="通过在Promise设置定时器来实现12345678910111213141516171819202122232425export function sleep(ms: number): Promise&lt;undefined&gt; &amp;#123;  &#x2F;&#x2F; 参考答案  return new Promise(    (      resolve: (value: undefined) &#x3D;&gt;">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-09-11T08:05:34.000Z">
-<meta property="article:modified_time" content="2023-09-11T08:30:31.060Z">
+<meta property="article:published_time" content="2023-09-11T08:32:22.000Z">
+<meta property="article:modified_time" content="2023-09-18T07:21:18.629Z">
 <meta property="article:author" content="xuxuxuyu">
-<meta property="article:tag" content="JS,TS,React,Vue">
+<meta property="article:tag" content="js">
+<meta property="article:tag" content="手写函数">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>TS方法重载 - 小雨滴滴滴滴滴滴的记录</title>
+  <title>实现sleep方法 - 小雨滴滴滴滴滴滴的记录</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -225,7 +226,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="TS方法重载"></span>
+            <span id="subtitle" data-typed-text="实现sleep方法"></span>
           
         </div>
 
@@ -236,7 +237,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-09-11 16:05" pubdate>
+        <time datetime="2023-09-11 16:32" pubdate>
           2023年9月11日 下午
         </time>
       </span>
@@ -248,7 +249,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          522 字
+          512 字
         
       </span>
     
@@ -296,15 +297,15 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">TS方法重载</h1>
+            <h1 id="seo-header">实现sleep方法</h1>
             
             
               <div class="markdown-body">
                 
-                <h3 id="概念：-多个函数签名体-唯一的一个函数体"><a href="#概念：-多个函数签名体-唯一的一个函数体" class="headerlink" title="概念： 多个函数签名体 + 唯一的一个函数体"></a>概念： 多个函数签名体 + 唯一的一个函数体</h3><ol>
-<li>实现获取字符串或数组长度<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getLength</span>(<span class="hljs-params">str: string</span>): number; <span class="hljs-comment">// 函数签名 -&gt; 传入字符串返回字符串长度</span><br><span class="hljs-keyword">function</span> getLength&lt;T&gt;(<span class="hljs-attr">arr</span>: T[]): number; <span class="hljs-comment">// 函数签名 -&gt; 传入数组返回数组长度</span><br><span class="hljs-keyword">function</span> getLength&lt;T&gt;(<span class="hljs-attr">value</span>: string | T[]): number &#123;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(value))&#123;<br>    <span class="hljs-keyword">return</span> value.<span class="hljs-property">length</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">return</span> value.<span class="hljs-property">length</span>;<br>  &#125;<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getLength</span>(<span class="hljs-string">&quot;string&quot;</span>)); <span class="hljs-comment">// Output: &quot;6&quot;</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getLength</span>([<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>])); <span class="hljs-comment">// Output: &quot;2&quot;</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getLength</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>])); <span class="hljs-comment">// Output: &quot;2&quot;</span><br><br></code></pre></td></tr></table></figure></li>
+                <ol>
+<li>通过在Promise设置定时器来实现<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">sleep</span>(<span class="hljs-params">ms: number</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-literal">undefined</span>&gt; &#123;<br>  <span class="hljs-comment">// 参考答案</span><br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<br>    <span class="hljs-function">(<span class="hljs-params"></span></span><br><span class="hljs-params"><span class="hljs-function">      resolve: (value: <span class="hljs-literal">undefined</span>) =&gt; <span class="hljs-keyword">void</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">    </span>) =&gt;</span> &#123;<br>      <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-title function_">resolve</span>(<span class="hljs-literal">undefined</span>);<br>      &#125;, ms);<br>    &#125;<br>  );<br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;a&quot;</span>);<br>  <span class="hljs-keyword">await</span> <span class="hljs-title function_">sleep</span>(<span class="hljs-number">1000</span>);<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;b&quot;</span>);<br>  <span class="hljs-keyword">await</span> <span class="hljs-title function_">sleep</span>(<span class="hljs-number">1000</span>);<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;c&quot;</span>);<br>&#125;<br><span class="hljs-title function_">main</span>();<br><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;&#125;;<br><br></code></pre></td></tr></table></figure></li>
 </ol>
-
+<h3 id="定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。"><a href="#定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。" class="headerlink" title="定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。"></a>定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。</h3>
                 
               </div>
             
@@ -312,27 +313,15 @@
             <div>
               <div class="post-metas my-3">
   
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
       
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/TS/" class="category-chain-item">TS</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
+        <a href="/tags/js/" class="print-no-link">#js</a>
+      
+        <a href="/tags/%E6%89%8B%E5%86%99%E5%87%BD%E6%95%B0/" class="print-no-link">#手写函数</a>
+      
     </div>
-  
   
 </div>
 
@@ -342,8 +331,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>TS方法重载</div>
-      <div>https://xuxuxuyu.github.io/2023/09/11/TS方法重载/</div>
+      <div>实现sleep方法</div>
+      <div>https://xuxuxuyu.github.io/2023/09/11/实现sleep方法/</div>
     </div>
     <div class="license-meta">
       

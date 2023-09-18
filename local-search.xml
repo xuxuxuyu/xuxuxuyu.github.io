@@ -4,19 +4,21 @@
   
   
   <entry>
-    <title>TS方法重载</title>
-    <link href="/2023/09/11/TS%E6%96%B9%E6%B3%95%E9%87%8D%E8%BD%BD/"/>
-    <url>/2023/09/11/TS%E6%96%B9%E6%B3%95%E9%87%8D%E8%BD%BD/</url>
+    <title>实现sleep方法</title>
+    <link href="/2023/09/11/%E5%AE%9E%E7%8E%B0sleep%E6%96%B9%E6%B3%95/"/>
+    <url>/2023/09/11/%E5%AE%9E%E7%8E%B0sleep%E6%96%B9%E6%B3%95/</url>
     
-    <content type="html"><![CDATA[<h3 id="概念：-多个函数签名体-唯一的一个函数体"><a href="#概念：-多个函数签名体-唯一的一个函数体" class="headerlink" title="概念： 多个函数签名体 + 唯一的一个函数体"></a>概念： 多个函数签名体 + 唯一的一个函数体</h3><ol><li>实现获取字符串或数组长度<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getLength</span>(<span class="hljs-params">str: string</span>): number; <span class="hljs-comment">// 函数签名 -&gt; 传入字符串返回字符串长度</span><br><span class="hljs-keyword">function</span> getLength&lt;T&gt;(<span class="hljs-attr">arr</span>: T[]): number; <span class="hljs-comment">// 函数签名 -&gt; 传入数组返回数组长度</span><br><span class="hljs-keyword">function</span> getLength&lt;T&gt;(<span class="hljs-attr">value</span>: string | T[]): number &#123;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(value))&#123;<br>    <span class="hljs-keyword">return</span> value.<span class="hljs-property">length</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">return</span> value.<span class="hljs-property">length</span>;<br>  &#125;<br>&#125;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getLength</span>(<span class="hljs-string">&quot;string&quot;</span>)); <span class="hljs-comment">// Output: &quot;6&quot;</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getLength</span>([<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>])); <span class="hljs-comment">// Output: &quot;2&quot;</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getLength</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>])); <span class="hljs-comment">// Output: &quot;2&quot;</span><br><br></code></pre></td></tr></table></figure></li></ol>]]></content>
+    <content type="html"><![CDATA[<ol><li>通过在Promise设置定时器来实现<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs js"><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">sleep</span>(<span class="hljs-params">ms: number</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-literal">undefined</span>&gt; &#123;<br>  <span class="hljs-comment">// 参考答案</span><br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<br>    <span class="hljs-function">(<span class="hljs-params"></span></span><br><span class="hljs-params"><span class="hljs-function">      resolve: (value: <span class="hljs-literal">undefined</span>) =&gt; <span class="hljs-keyword">void</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">    </span>) =&gt;</span> &#123;<br>      <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-title function_">resolve</span>(<span class="hljs-literal">undefined</span>);<br>      &#125;, ms);<br>    &#125;<br>  );<br>&#125;<br><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;a&quot;</span>);<br>  <span class="hljs-keyword">await</span> <span class="hljs-title function_">sleep</span>(<span class="hljs-number">1000</span>);<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;b&quot;</span>);<br>  <span class="hljs-keyword">await</span> <span class="hljs-title function_">sleep</span>(<span class="hljs-number">1000</span>);<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;c&quot;</span>);<br>&#125;<br><span class="hljs-title function_">main</span>();<br><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;&#125;;<br><br></code></pre></td></tr></table></figure></li></ol><h3 id="定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。"><a href="#定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。" class="headerlink" title="定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。"></a>定时器执行后存在时间误差，因为setTimeout属于宏任务，在执行宏任务之前如果当前执行栈中在执行的任务超过了定时器设定的时间，是可能存在误差的。</h3>]]></content>
     
     
-    <categories>
+    
+    <tags>
       
-      <category>TS</category>
+      <tag>js</tag>
       
-    </categories>
-    
+      <tag>手写函数</tag>
+      
+    </tags>
     
   </entry>
   
@@ -94,31 +96,6 @@
   
   
   <entry>
-    <title>面试题</title>
-    <link href="/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/"/>
-    <url>/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/</url>
-    
-    <content type="html"><![CDATA[<ol><li><p>HTML5 新增的一些标签</p></li><li><p>CSS3 新特性</p></li><li><p>实现垂直水平居中的几种方式 (30%)</p></li><li><p>JS 的数据类型以及区别（数据类型检测的方式 typeof instanceof constructor Object.prototype.toString.call()）</p></li><li><p>JS 的原型</p></li><li><p>JS 实现继承的方式</p></li><li><p>call,apply,bind 的区别</p></li><li><p>JS 事件监听以及事件阶段（捕获阶段、目标阶段、冒泡阶段）</p></li><li><p>阻止事件冒泡兼容 IE（event.cancelBubble &#x3D; true;）</p></li><li><p>事件委托</p></li><li><p>js 内置对象（数组、字符串常用的）</p></li><li><p>原生 ajax 对象 XMLHttpRequest，</p></li><li><p>跨域以及跨域的解决办法</p></li><li><p>es6 新增的一些</p></li><li><p>promise，实例方法</p></li><li><p>异步编程的几种方式</p></li><li><p>宏任务微任务</p></li><li><p>定时器的第二个参数时间是如何衡量的（函数只是将事件插入了任务列表，必须等到当前代码执行完，主线程才会去 执行它指定的回调函数，有可能要等很久，所以没有办法保证回调函数一定会在 setTimeout 指定的时间内执行，100 毫秒是插入队列的时间+等待的时间）</p></li><li><p>介绍防抖节流原理</p></li><li><p>JS 的垃圾回收机制</p></li><li><p>ts 中 type, interface 区别</p></li><li><p>ts 断言，非空断言</p></li><li><p>http 常见状态码（304 协商缓存）</p></li><li><p>说说地址栏输入 URL 敲下回车后发生了什么<br>URL 解析<br>DNS 查询<br>TCP 连接<br>HTTP 请求<br>响应请求<br>页面渲染</p></li><li><p>get,post 请求区别</p></li><li><p>react 生命周期</p></li><li><p>setState 异步同步</p></li><li><p>解释一下虚拟 dom</p></li><li><p>react 中 key 的作用</p></li><li><p>常用的 hooks</p></li><li><p>useMemo 和 useCallback 区别</p></li><li><p>vue 的内置指令有哪些</p></li><li><p>vue 双向绑定原理</p></li><li><p>vue 如何检测数组变化</p></li><li><p>vue 如何实现组件之间的通信<br>$parent &#x2F; $children &amp; $refs<br>Provider &#x2F; Inject<br>$attrs &#x2F; $listeners<br>Vuex<br>$emit &#x2F; $on</p></li><li><p>vue3.0 双向绑定原理</p></li><li><p>vue3.0 与 2.0 有哪些区别</p></li><li><p>前端优化<br>基于现有网页做 seo 优化方面的工作，具体如何实现的</p></li></ol><p><code>通过</code>webpack&#96;优化前端的手段有：</p><ul><li>JS 代码压缩</li><li>CSS 代码压缩</li><li>Html 文件代码压缩</li><li>文件大小压缩</li><li>图片压缩</li><li>Tree Shaking</li><li>代码分离</li><li>内联 chunk</li></ul>]]></content>
-    
-    
-    <categories>
-      
-      <category>面试</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>面试题</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>防抖节流函数</title>
     <link href="/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/"/>
     <url>/2022/06/16/%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E5%87%BD%E6%95%B0/</url>
@@ -138,6 +115,31 @@
       <tag>js</tag>
       
       <tag>手写函数</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>面试题</title>
+    <link href="/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/"/>
+    <url>/2022/06/16/%E9%9D%A2%E8%AF%95%E9%A2%98/</url>
+    
+    <content type="html"><![CDATA[<ol><li><p>HTML5 新增的一些标签</p></li><li><p>CSS3 新特性</p></li><li><p>实现垂直水平居中的几种方式 (30%)</p></li><li><p>JS 的数据类型以及区别（数据类型检测的方式 typeof instanceof constructor Object.prototype.toString.call()）</p></li><li><p>JS 的原型</p></li><li><p>JS 实现继承的方式</p></li><li><p>call,apply,bind 的区别</p></li><li><p>JS 事件监听以及事件阶段（捕获阶段、目标阶段、冒泡阶段）</p></li><li><p>阻止事件冒泡兼容 IE（event.cancelBubble &#x3D; true;）</p></li><li><p>事件委托</p></li><li><p>js 内置对象（数组、字符串常用的）</p></li><li><p>原生 ajax 对象 XMLHttpRequest，</p></li><li><p>跨域以及跨域的解决办法</p></li><li><p>es6 新增的一些</p></li><li><p>promise，实例方法</p></li><li><p>异步编程的几种方式</p></li><li><p>宏任务微任务</p></li><li><p>定时器的第二个参数时间是如何衡量的（函数只是将事件插入了任务列表，必须等到当前代码执行完，主线程才会去 执行它指定的回调函数，有可能要等很久，所以没有办法保证回调函数一定会在 setTimeout 指定的时间内执行，100 毫秒是插入队列的时间+等待的时间）</p></li><li><p>介绍防抖节流原理</p></li><li><p>JS 的垃圾回收机制</p></li><li><p>ts 中 type, interface 区别</p></li><li><p>ts 断言，非空断言</p></li><li><p>http 常见状态码（304 协商缓存）</p></li><li><p>说说地址栏输入 URL 敲下回车后发生了什么<br>URL 解析<br>DNS 查询<br>TCP 连接<br>HTTP 请求<br>响应请求<br>页面渲染</p></li><li><p>get,post 请求区别</p></li><li><p>react 生命周期</p></li><li><p>setState 异步同步</p></li><li><p>解释一下虚拟 dom</p></li><li><p>react 中 key 的作用</p></li><li><p>常用的 hooks</p></li><li><p>useMemo 和 useCallback 区别</p></li><li><p>vue 的内置指令有哪些</p></li><li><p>vue 双向绑定原理</p></li><li><p>vue 如何检测数组变化</p></li><li><p>vue 如何实现组件之间的通信<br>$parent &#x2F; $children &amp; $refs<br>Provider &#x2F; Inject<br>$attrs &#x2F; $listeners<br>Vuex<br>$emit &#x2F; $on</p></li><li><p>vue3.0 双向绑定原理</p></li><li><p>vue3.0 与 2.0 有哪些区别</p></li><li><p>前端优化<br>基于现有网页做 seo 优化方面的工作，具体如何实现的</p></li></ol><p><code>通过</code>webpack&#96;优化前端的手段有：</p><ul><li>JS 代码压缩</li><li>CSS 代码压缩</li><li>Html 文件代码压缩</li><li>文件大小压缩</li><li>图片压缩</li><li>Tree Shaking</li><li>代码分离</li><li>内联 chunk</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试题</tag>
       
     </tags>
     
