@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>和瓷兜兜的金陵记忆</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family:
+        "PingFang SC",
+        "Microsoft YaHei",
+        "Helvetica Neue",
+        sans-serif;
+      background: #0f0f12;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 35%),
+        linear-gradient(135deg, #0f0f12, #1a1a22);
+    }
+
+    .slider {
+      position: relative;
+      width: 90vw;
+      height: 86vh;
+      overflow: hidden;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(20px);
+
+      box-shadow:
+        0 20px 80px rgba(0,0,0,0.45),
+        inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .slides {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: scale(1.03);
+
+      transition:
+        opacity 1.6s ease,
+        transform 6s ease;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    /* 模糊背景 */
+    .slide .bg {
+      position: absolute;
+      inset: 0;
+
+      background-size: cover;
+      background-position: center;
+
+      filter: blur(45px) brightness(0.42);
+      transform: scale(1.2);
+    }
+
+    /* 主图 */
+    .slide img {
+      position: relative;
+      z-index: 2;
+
+      width: auto;
+      height: auto;
+
+      max-width: 82%;
+      max-height: 82%;
+
+      object-fit: contain;
+
+      border-radius: 26px;
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.42),
+        0 0 0 1px rgba(255,255,255,0.05);
+
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    /* 暗层 */
+    .overlay {
+      position: absolute;
+      inset: 0;
+
+      background:
+        linear-gradient(
+          to top,
+          rgba(0,0,0,0.5),
+          rgba(0,0,0,0.08) 40%,
+          rgba(0,0,0,0.22)
+        );
+
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* 左上角 */
+    .tag {
+      position: absolute;
+      top: 34px;
+      left: 34px;
+      z-index: 10;
+
+      padding: 10px 18px;
+
+      border-radius: 999px;
+
+      font-size: 12px;
+      letter-spacing: 3px;
+
+      color: rgba(255,255,255,0.78);
+
+      border: 1px solid rgba(255,255,255,0.08);
+
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px);
+    }
+
+    /* 文案 */
+    .content {
+      position: absolute;
+      left: 52px;
+      bottom: 52px;
+      z-index: 10;
+      color: #fff;
+    }
+
+    .content .sub {
+      font-size: 13px;
+      letter-spacing: 5px;
+      opacity: 0.7;
+      margin-bottom: 18px;
+    }
+
+    .content h1 {
+      font-size: 52px;
+      line-height: 1.2;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+
+    .content p {
+      margin-top: 18px;
+      max-width: 500px;
+
+      line-height: 1.9;
+
+      font-size: 15px;
+      font-weight: 300;
+
+      color: rgba(255,255,255,0.72);
+    }
+
+    /* 分页 */
+    .pagination {
+      position: absolute;
+      right: 38px;
+      bottom: 38px;
+      z-index: 20;
+
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 26px;
+      height: 4px;
+
+      border-radius: 999px;
+
+      background: rgba(255,255,255,0.24);
+
+      transition: 0.4s;
+    }
+
+    .dot.active {
+      width: 44px;
+      background: rgba(255,255,255,0.92);
+    }
+
+    /* 底部进度条 */
+    .progress {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+
+      width: 100%;
+      height: 3px;
+
+      background: rgba(255,255,255,0.08);
+
+      z-index: 20;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+
+      background: rgba(255,255,255,0.9);
+
+      animation: progress 6s linear infinite;
+    }
+
+    @keyframes progress {
+      from {
+        width: 0%;
+      }
+      to {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .slider {
+        width: 94vw;
+        height: 92vh;
+        border-radius: 24px;
+      }
+
+      .slide img {
+        max-width: 92%;
+        max-height: 74%;
+        border-radius: 20px;
+      }
+
+      .content {
+        left: 28px;
+        right: 28px;
+        bottom: 36px;
+      }
+
+      .content h1 {
+        font-size: 32px;
+      }
+
+      .content p {
+        font-size: 14px;
+      }
+
+      .pagination {
+        right: 24px;
+        bottom: 24px;
+      }
+
+      .tag {
+        left: 22px;
+        top: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="slider">
+
+    <div class="tag">金陵记忆</div>
+
+    <div class="slides">
+
+      <!-- 1 -->
+      <div class="slide active">
+        <div class="bg" style="background-image: url('./0.jpeg')"></div>
+        <img src="./0.jpeg" alt="">
+      </div>
+
+      <!-- 2 -->
+      <div class="slide">
+        <div class="bg" style="background-image: url('./1.jpg')"></div>
+        <img src="./1.jpg" alt="">
+      </div>
+
+      <!-- 3 -->
+      <div class="slide">
+        <div class="bg" style="background-image: url('./3.jpeg')"></div>
+        <img src="./3.jpeg" alt="">
+      </div>
+
+      <!-- 4 -->
+      <div class="slide">
+        <div class="bg" style="background-image: url('./4.jpeg')"></div>
+        <img src="./4.jpeg" alt="">
+      </div>
+
+      <!-- 5 -->
+      <div class="slide">
+        <div class="bg" style="background-image: url('./5.jpeg')"></div>
+        <img src="./5.jpeg" alt="">
+      </div>
+
+      <!-- 6 -->
+      <div class="slide">
+        <div class="bg" style="background-image: url('./6.jpeg')"></div>
+        <img src="./6.jpeg" alt="">
+      </div>
+
+    </div>
+
+    <div class="overlay"></div>
+
+    <div class="content">
+      <div class="sub">FOREVER WITH YOU</div>
+
+      <h1>
+        Every Moment <br>
+        Feels Like A Movie
+      </h1>
+
+      <p>
+        遇见你之后，日子开始变得柔软，连风都带着温柔。
+      </p>
+    </div>
+
+    <div class="pagination">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+
+    let current = 0;
+
+    function showSlide(index) {
+
+      slides.forEach(slide => {
+        slide.classList.remove('active');
+      });
+
+      dots.forEach(dot => {
+        dot.classList.remove('active');
+      });
+
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+
+      // 重置进度条动画
+      const bar = document.querySelector('.progress-bar');
+
+      bar.style.animation = 'none';
+      bar.offsetHeight;
+
+      bar.style.animation = 'progress 6s linear infinite';
+    }
+
+    setInterval(() => {
+
+      current++;
+
+      if (current >= slides.length) {
+        current = 0;
+      }
+
+      showSlide(current);
+
+    }, 6000);
+  </script>
+
+</body>
+</html>

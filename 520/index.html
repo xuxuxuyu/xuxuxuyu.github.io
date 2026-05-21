@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>瓷兜兜（版权所有，盗者必究）</title>
+  <style>
+    :root {
+      --bg1: #06070d;
+      --bg2: #130a1f;
+      --pink: #ff4d9a;
+      --pink-soft: #ff7bb5;
+      --blue-soft: #a6c7ff;
+      --text: #fff6fb;
+      --sub: #f5cce0;
+      --glow: rgba(255, 77, 154, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 78%, #231535 0%, var(--bg1) 62%, #030309 100%);
+      color: var(--text);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    }
+
+    .wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      isolation: isolate;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 75%, transparent 0 32%, rgba(0,0,0,.28) 78%, rgba(0,0,0,.58) 100%),
+        radial-gradient(circle at 30% 20%, rgba(255, 100, 180, .08), transparent 45%),
+        radial-gradient(circle at 70% 30%, rgba(140, 180, 255, .10), transparent 42%);
+      z-index: 2;
+    }
+
+    .text-box {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 3;
+      width: min(86vw, 760px);
+      padding: 0 18px;
+      text-shadow: 0 0 18px rgba(255, 130, 189, .35);
+      animation: floatText 3.6s ease-in-out infinite;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 5.4vw, 48px);
+      line-height: 1.22;
+      letter-spacing: 1.2px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 14px 0 0;
+      font-size: clamp(14px, 2.8vw, 22px);
+      /* color: var(--sub); */
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 16px rgba(255, 255, 255, 0.4);
+      min-height: 1.9em;
+      letter-spacing: .8px;
+      font-size: 14px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 1ch;
+      color: var(--pink-soft);
+      animation: blink 1s step-end infinite;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-size: 13px;
+      color: rgba(255, 230, 241, 0.65);
+      letter-spacing: .6px;
+      user-select: none;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes floatText {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-5px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .text-box { animation: none; }
+      .cursor { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <canvas id="c"></canvas>
+    <div class="vignette"></div>
+
+    <div class="text-box">
+
+      <p><span id="typed"></span><span class="cursor"></span></p>
+    </div>
+
+
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d', { alpha: true });
+
+      const DPR = Math.min(window.devicePixelRatio || 1, 2);
+      let w = 0;
+      let h = 0;
+      let groundY = 0;
+
+      const state = {
+        particles: [],
+        sparks: [],
+        lastTime: 0,
+        running: true
+      };
+
+      function resize() {
+        w = Math.floor(window.innerWidth);
+        h = Math.floor(window.innerHeight);
+        canvas.width = Math.floor(w * DPR);
+        canvas.height = Math.floor(h * DPR);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        groundY = h * 0.83;
+      }
+
+      function heartPoint(t, scale) {
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+        return { x: x * scale, y: y * scale };
+      }
+
+      function makeHeartCloud() {
+        const amount = Math.min(1300, Math.max(620, Math.floor((w * h) / 1700)));
+        const cx = w * 0.5;
+        const cy = h * 0.34;
+        const baseScale = Math.min(w, h) * 0.012;
+
+        state.particles.length = 0;
+        for (let i = 0; i < amount; i++) {
+          const t = Math.random() * Math.PI * 2;
+          const p = heartPoint(t, baseScale * (0.82 + Math.random() * 0.36));
+          const spread = Math.random() * 26;
+          const a = Math.random() * Math.PI * 2;
+
+          state.particles.push({
+            x: cx + p.x + Math.cos(a) * spread,
+            y: cy + p.y + Math.sin(a) * spread,
+            vx: (Math.random() - 0.5) * 0.06,
+            vy: 0.15 + Math.random() * 0.3,
+            r: 0.9 + Math.random() * 2,
+            life: 0,
+            ttl: 180 + Math.random() * 130,
+            hue: 330 + Math.random() * 18,
+            sat: 90 + Math.random() * 10,
+            lit: 58 + Math.random() * 18
+          });
+        }
+      }
+
+      function addSpark(x, y, count = 14) {
+        for (let i = 0; i < count; i++) {
+          const ang = Math.random() * Math.PI * 2;
+          const speed = 0.5 + Math.random() * 2.4;
+          state.sparks.push({
+            x,
+            y,
+            vx: Math.cos(ang) * speed,
+            vy: Math.sin(ang) * speed - 0.6,
+            g: 0.035,
+            drag: 0.988,
+            life: 0,
+            ttl: 48 + Math.random() * 26,
+            r: 1 + Math.random() * 1.7,
+            color: Math.random() > 0.2 ? '255,110,185' : '180,206,255'
+          });
+        }
+      }
+
+      function drawGroundGlow() {
+        const grd = ctx.createRadialGradient(w * 0.5, groundY, 10, w * 0.5, groundY, Math.min(w, h) * 0.32);
+        grd.addColorStop(0, 'rgba(215, 226, 255, 0.26)');
+        grd.addColorStop(0.45, 'rgba(154, 183, 255, 0.18)');
+        grd.addColorStop(1, 'rgba(20, 25, 45, 0)');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.ellipse(w * 0.5, groundY, w * 0.28, h * 0.06, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function tick(ts) {
+        if (!state.running) return;
+        if (!state.lastTime) state.lastTime = ts;
+        const dt = Math.min(32, ts - state.lastTime) / 16.67;
+        state.lastTime = ts;
+
+        ctx.clearRect(0, 0, w, h);
+        drawGroundGlow();
+
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.life += dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vx *= 0.998;
+          p.vy += 0.009 * dt;
+
+          const alpha = Math.max(0, 1 - p.life / p.ttl);
+          ctx.fillStyle = `hsla(${p.hue}, ${p.sat}%, ${p.lit}%, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (Math.random() < 0.0028) addSpark(p.x, p.y, 1);
+
+          if (p.y >= groundY + (Math.random() * 5 - 2.5) || alpha <= 0.02) {
+            state.particles.splice(i, 1);
+
+            const rx = (Math.random() - 0.5) * w * 0.5;
+            const px = w * 0.5 + rx;
+            const py = groundY + (Math.random() - 0.5) * h * 0.045;
+
+            const t = Math.random() * Math.PI * 2;
+            const baseScale = Math.min(w, h) * 0.012;
+            const hp = heartPoint(t, baseScale * (0.82 + Math.random() * 0.36));
+            const spread = Math.random() * 26;
+            const a = Math.random() * Math.PI * 2;
+
+            state.particles.push({
+              x: w * 0.5 + hp.x + Math.cos(a) * spread,
+              y: h * 0.34 + hp.y + Math.sin(a) * spread,
+              vx: (Math.random() - 0.5) * 0.06,
+              vy: 0.15 + Math.random() * 0.3,
+              r: 0.9 + Math.random() * 2,
+              life: 0,
+              ttl: 180 + Math.random() * 130,
+              hue: 330 + Math.random() * 18,
+              sat: 90 + Math.random() * 10,
+              lit: 58 + Math.random() * 18
+            });
+
+            if (Math.random() < 0.4) {
+              addSpark(px, py, 2);
+            }
+          }
+        }
+
+        for (let i = state.sparks.length - 1; i >= 0; i--) {
+          const s = state.sparks[i];
+          s.life += dt;
+          s.vx *= Math.pow(s.drag, dt);
+          s.vy = s.vy * Math.pow(s.drag, dt) + s.g * dt;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+
+          const alpha = Math.max(0, 1 - s.life / s.ttl);
+          ctx.fillStyle = `rgba(${s.color}, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (alpha <= 0.01) state.sparks.splice(i, 1);
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      function spawnClickHearts(x, y) {
+        const n = 22;
+        for (let i = 0; i < n; i++) {
+          const t = Math.random() * Math.PI * 2;
+          const p = heartPoint(t, 0.55 + Math.random() * 0.35);
+          state.sparks.push({
+            x: x + p.x,
+            y: y + p.y,
+            vx: (Math.random() - 0.5) * 2.3,
+            vy: -1.2 - Math.random() * 2.0,
+            g: 0.045,
+            drag: 0.985,
+            life: 0,
+            ttl: 58 + Math.random() * 28,
+            r: 1.2 + Math.random() * 1.6,
+            color: '255,120,195'
+          });
+        }
+      }
+
+      const lines = [
+        '在我狂风和暴雨里，你就是天晴',
+        '在我等待和煎熬里，你就是氧气',
+        '在我破碎和荒凉里，你就是奇迹',
+      ];
+
+      const typedEl = document.getElementById('typed');
+      let lineIndex = 0;
+      let charIndex = 0;
+
+      function typeLoop() {
+        const line = lines[lineIndex];
+        typedEl.textContent = line.slice(0, charIndex++);
+        if (charIndex <= line.length) {
+          setTimeout(typeLoop, 75);
+        } else {
+          setTimeout(() => {
+            charIndex = 0;
+            lineIndex = (lineIndex + 1) % lines.length;
+            typeLoop();
+          }, 1700);
+        }
+      }
+
+      function onVisibility() {
+        state.running = !document.hidden;
+        if (state.running) {
+          state.lastTime = 0;
+          requestAnimationFrame(tick);
+        }
+      }
+
+      window.addEventListener('resize', () => {
+        resize();
+        makeHeartCloud();
+      }, { passive: true });
+
+      document.addEventListener('visibilitychange', onVisibility, { passive: true });
+      window.addEventListener('pointerdown', (e) => {
+        spawnClickHearts(e.clientX, e.clientY);
+      }, { passive: true });
+
+      resize();
+      makeHeartCloud();
+      requestAnimationFrame(tick);
+      setTimeout(typeLoop, 600);
+    })();
+  </script>
+</body>
+</html>
